@@ -34,32 +34,39 @@ campus.click()
 search = driver.find_element_by_id('CPH1_btnKensaku')
 search.click()
 
+for j in range(0, 5):
+  for i in range(0, 20):
+    dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
+    title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
+    lecturerName = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKyouin_{i}')
+    print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
+    # 詳細ページ
+    detail = driver.find_element_by_id(f'CPH1_gvw_kensaku_lnkShousai_{i}')
+    driver.execute_script('arguments[0].click();', detail)
+    # detail.click()
+    # if driver.find_element_by_id('CPH1_gvSeiseki'):
+    #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')
+    try:
+      evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
+      print(evaluation.text)
+    except NoSuchElementException:
+      print('データなし')
 
-for i in range(0, 20):
-  dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
-  title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
-  lecturerName = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKyouin_{i}')
-  print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
-  # 詳細ページ
-  detail = driver.find_element_by_id(f'CPH1_gvw_kensaku_lnkShousai_{i}')
-  driver.execute_script('arguments[0].click();', detail)
-  # detail.click()
-  # if driver.find_element_by_id('CPH1_gvSeiseki'):
-  #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')
-  try:
-    evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
-    print(evaluation.text)
-  except NoSuchElementException:
-    print('データなし')
+    print()
+    # 戻るボタン
+    backBtn = driver.find_element_by_id('hypBack')
+    backBtn.click()
+  
+  # 次のページへのボタン
+  nextBtn = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
+  driver.execute_script('arguments[0].click();', nextBtn)
 
-  print()
-  # 戻るボタン
-  backBtn = driver.find_element_by_id('hypBack')
-  backBtn.click()
 
-# 次のページへのボタン
-nextBtn1 = driver.find_element_by_id('CPH1_rptPagerB_lnkPage_1')
-nextBtn1.click()
+# try:
+#   nextBtn1 = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
+#   nextBtn1.click()
+# except NoSuchElementException:
+#   None
 
 # chromeを開いたままpython seleniumを終了してchromeを開いたままにする
 os.kill(driver.service.process.pid, signal.SIGTERM)
