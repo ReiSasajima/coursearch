@@ -1,7 +1,9 @@
+from turtle import back
 import idna
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 import os, signal
 import csv
 
@@ -13,6 +15,7 @@ options = Options()
 options.add_argument('--headless')
 # chromeoption=optionsでブラウザ非表示を適用
 driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+# driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.implicitly_wait(10)
 # driver.get('https://aoyama-portal.aoyama.ac.jp/aogaku_auth/jsp/AUTH01.jsp?TYPE=33554433&REALMOID=06-2a27689c-587a-42e0-834c-7a6751c24219&GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-y%2fO%2bwXHmQFuKEoGlz9CdfIzo1Ujfp%2fcsgj66pcDn%2bqoJ8OCObeoRcIMe463sPxZH&TARGET=-SM-https%3a%2f%2faoyama--portal%2eaoyama%2eac%2ejp%2fprotect%2f')
 
@@ -27,10 +30,6 @@ driver.get('http://syllabus.aoyama.ac.jp/')
 campus = driver.find_element_by_id('CPH1_rptCP_CP_0')
 campus.click()
 
-# 講師名の項目
-# lecturer = driver.find_element_by_id('CPH1_KI')
-# lecturer.send_keys("名前")
-
 # 検索ボタン
 search = driver.find_element_by_id('CPH1_btnKensaku')
 search.click()
@@ -40,30 +39,26 @@ for i in range(0, 20):
   dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
   title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
   lecturerName = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKyouin_{i}')
-
-  # courseDescription = driver.find_element_by_id('CPH1_lblGaiyou')
-  # driver.back()
-
   print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
-
-
-  # print(courseDescription.text)
-
-# 詳細へアクセス
+  # 詳細ページ
+  detail = driver.find_element_by_id(f'CPH1_gvw_kensaku_lnkShousai_{i}')
+  detail.click()
+  # if driver.find_element_by_id('CPH1_gvSeiseki'):
+  # if driver.find_element_by_id('CPH1_tr_Seiseki'):
+  #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')
+  try:
+    evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
+    print(evaluation.text)
+  except NoSuchElementException:
+    print('データなし')
+  print()
+  # 戻るボタン
+  backBtn = driver.find_element_by_id('hypBack')
+  backBtn.click()
 
 # 次のページへのボタン
 nextBtn1 = driver.find_element_by_id('CPH1_rptPagerB_lnkPage_1')
 nextBtn1.click()
-
-
-for i in range(0, 20):
-  dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
-  title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
-  lecturerName = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKyouin_{i}')
-  print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
-
-
-
 
 # for j in range(1, 380):
 #   for i in range(0, 20):
