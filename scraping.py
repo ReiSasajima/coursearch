@@ -6,6 +6,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 import os, signal
 import csv
+import datetime
+
+# 出力するCSVのファイル名に日付を付与
+csv_date = datetime.datetime.today().strftime("%Y%m%d")
+csv_file_name = 'aguSyllabus_' + csv_date + '.csv'
+# 空のCSVファイルに書き込み
+f = open(csv_file_name, 'w', encoding='cp932', errors='ignore')
+
+writer = csv.writer(f, lineterminator='\n') 
+csv_header = ["授業時間","授業名","講師名","授業評価方法"]
+writer.writerow(csv_header)
 
 # chrome_options = Options()
 # chrome_options.add_experimental_option("detach", True)
@@ -34,12 +45,16 @@ campus.click()
 search = driver.find_element_by_id('CPH1_btnKensaku')
 search.click()
 
-for j in range(0, 5):
+for j in range(0, 2):
   for i in range(0, 20):
     dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
     title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
     lecturerName = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKyouin_{i}')
-    print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
+    csvlist = []
+    csvlist.append(dateTime.text)
+    csvlist.append(title.text)
+    csvlist.append(lecturerName.text)
+    # print(dateTime.text, '授業名:', title.text, '講師名:', lecturerName.text)
     # 詳細ページ
     detail = driver.find_element_by_id(f'CPH1_gvw_kensaku_lnkShousai_{i}')
     driver.execute_script('arguments[0].click();', detail)
@@ -48,10 +63,12 @@ for j in range(0, 5):
     #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')
     try:
       evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
-      print(evaluation.text)
+      # print(evaluation.text)
+      csvlist.append(evaluation.text)
     except NoSuchElementException:
-      print('データなし')
-
+      # print('データなし')
+      csvlist.append('データなし')
+    writer.writerow(csvlist)
     print()
     # 戻るボタン
     backBtn = driver.find_element_by_id('hypBack')
@@ -61,7 +78,7 @@ for j in range(0, 5):
   nextBtn = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
   driver.execute_script('arguments[0].click();', nextBtn)
 
-
+f.close()
 # try:
 #   nextBtn1 = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
 #   nextBtn1.click()
