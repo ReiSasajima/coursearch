@@ -20,7 +20,7 @@ f = open(csv_file_name, 'w', encoding='cp932', errors='ignore')
 
 writer = csv.writer(f, lineterminator='\n') 
 # csv_header = ["授業時間","授業名","講師名","教室番号","授業評価方法"]
-csv_header = ["授業時間","授業名","講師名","単位数","開講学部","URL","授業評価方法","講義概要"]
+csv_header = ["授業時間","授業名","講師名","単位数","開講学部","URL","授業評価方法","授業方法","講義概要"]
 
 # ヘッダーをCSVの１行目に書き込み
 writer.writerow(csv_header)
@@ -63,11 +63,15 @@ campus.click()
 # campus = driver.find_element_by_id('CPH1_rptCP_CP_1')
 # campus.click()
 
+# オンライン授業を選択
+online = driver.find_element_by_id('CPH1_OL')
+online.click()
+
 # 検索ボタン
 search = driver.find_element_by_id('CPH1_btnKensaku')
 search.click()
 
-for j in range(0, 20):
+for j in range(0, 1):
   for i in range(0, 20):
     dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
     title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
@@ -95,17 +99,45 @@ for j in range(0, 20):
     csvlist.append(shortened_link)
     print(shortened_link)
     # if driver.find_element_by_id('CPH1_gvSeiseki'):
-    #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')  
+    #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki') 
 
+    # 授業の評価方法の取得
     try:
       evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
       print(evaluation.text)
       csvlist.append(evaluation.text)
     except NoSuchElementException:
       # 成績評価方法がなかった際の処理
-      print('データなし・公式シラバスを確認ください')
+      print('評価方法データなし・公式シラバスを確認ください')
       csvlist.append('データなし・公式シラバスを確認ください')
     
+    # 授業が対面かオンラインかの判定
+    if driver.find_elements_by_id('CPH1_lbl_facetoface'):
+      method = driver.find_element_by_id('CPH1_lbl_facetoface')
+      print(method.text)
+      csvlist.append(method.text)
+    elif driver.find_elements_by_id('CPH1_lbl_online'):
+      method = driver.find_element_by_id('CPH1_lbl_online')
+      print(method.text)
+      csvlist.append(method.text)
+    else:
+      print('授業形態確認なし・公式シラバスを確認ください')
+      csvlist.append('授業形態なし・公式シラバスを確認ください')
+    # try:
+    #   method = driver.find_element_by_id('CPH1_lbl_facetoface')
+    #   print(method.text)
+    #   csvlist.append(method.text)
+    # except NoSuchElementException:
+    #   None
+    # try:
+    #   method = driver.find_element_by_id('CPH1_lbl_online')
+    #   print(method.text)
+    #   csvlist.append(method.text)
+    # except NoSuchElementException:
+    #   print('授業形態確認なし・公式シラバスを確認ください')
+    #   csvlist.append('授業形態なし・公式シラバスを確認ください')
+
+    # 授業の講義概要の取得
     try:
       description = driver.find_element_by_id('CPH1_lblGaiyou')
       print("授業概要:",description.text)
@@ -114,12 +146,17 @@ for j in range(0, 20):
       print('講義概要なし・公式シラバスを確認ください')
       csvlist.append('講義概要なし・公式シラバスを確認ください')
 
-    if driver.find_element_by_id('CPH1_lbl_facetoface'):
-      method = driver.find_element_by_id('CPH1_lbl_facetoface')
-      print(method.text)
-    elif driver.find_element_by_id('CPH1_lbl_online'):
-      method = driver.find_element_by_id('CPH1_lbl_online')
-      print(method.text)
+    
+
+    # if driver.find_element_by_id('CPH1_lbl_facetoface').text:
+    #   method = driver.find_element_by_id('CPH1_lbl_facetoface')
+    #   print(method.text)
+    # elif driver.find_element_by_id('CPH1_lbl_online').text:
+    #   method = driver.find_element_by_id('CPH1_lbl_online')
+    #   print(method.text)
+    # else:
+    #   csvlist.append('授業形態確認なし・公式シラバスを確認ください')
+    
 
     # １行づつCSVに書き込み
     writer.writerow(csvlist)
