@@ -8,6 +8,7 @@ from selenium.common.exceptions import NoSuchElementException
 import os, signal
 import csv
 import datetime
+from pyshorteners import Shortener
 
 
 # 出力するCSVのファイル名に日付を付与
@@ -21,8 +22,8 @@ writer = csv.writer(f, lineterminator='\n')
 csv_header = ["授業時間","授業名","講師名","授業評価方法","URL"]
 writer.writerow(csv_header)
 
-
-
+# 短縮URLモジュール
+s = Shortener()
 # chrome_options = Options()
 # chrome_options.add_experimental_option("detach", True)
 
@@ -82,8 +83,11 @@ for j in range(0, 5):
     driver.execute_script('arguments[0].click();', detail)
     # URLの取得
     cur_url = driver.current_url
-    csvlist.append(cur_url)
-    print(cur_url)
+    # URLの短縮実行
+    shortened_link = s.tinyurl.short(cur_url)
+    # 短縮URLをCSVに追加
+    csvlist.append(shortened_link)
+    print(shortened_link)
     # if driver.find_element_by_id('CPH1_gvSeiseki'):
     #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki')
     try:
