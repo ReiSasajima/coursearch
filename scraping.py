@@ -9,7 +9,7 @@ import os, signal
 import csv
 import datetime
 # URL短縮ライブラリ
-from pyshorteners import Shortener
+# from pyshorteners import Shortener
 
 
 # 出力するCSVのファイル名に日付を付与
@@ -26,7 +26,7 @@ csv_header = ["授業時間","授業名","講師名","単位数","開講学部",
 writer.writerow(csv_header)
 
 # 短縮URLモジュール
-s = Shortener()
+# s = Shortener()
 # chrome_options = Options()
 # chrome_options.add_experimental_option("detach", True)
 
@@ -64,14 +64,14 @@ campus.click()
 # campus.click()
 
 # オンライン授業を選択
-online = driver.find_element_by_id('CPH1_OL')
-online.click()
+# online = driver.find_element_by_id('CPH1_OL')
+# online.click()
 
 # 検索ボタン
 search = driver.find_element_by_id('CPH1_btnKensaku')
 search.click()
 
-for j in range(0, 1):
+for j in range(0, 380):
   for i in range(0, 20):
     dateTime = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblJigen_{i}')
     title = driver.find_element_by_id(f'CPH1_gvw_kensaku_lblKamoku_{i}')
@@ -94,13 +94,14 @@ for j in range(0, 1):
     # URLの取得
     cur_url = driver.current_url
     # URLの短縮実行
-    shortened_link = s.tinyurl.short(cur_url)
+    # shortened_link = s.tinyurl.short(cur_url)
     # 短縮URLをCSVに追加
-    csvlist.append(shortened_link)
-    print(shortened_link)
+    csvlist.append(cur_url)
+    print(cur_url)
     # if driver.find_element_by_id('CPH1_gvSeiseki'):
     #   evaluation = driver.find_element_by_id('CPH1_tr_Seiseki') 
 
+    
     # 授業の評価方法の取得
     try:
       evaluation = driver.find_element_by_id('CPH1_gvSeiseki')
@@ -111,7 +112,7 @@ for j in range(0, 1):
       print('評価方法データなし・公式シラバスを確認ください')
       csvlist.append('データなし・公式シラバスを確認ください')
     
-    # 授業が対面かオンラインかの判定
+    # 授業が対面かオンラインかの判定 if文のelementをelementsにする。
     if driver.find_elements_by_id('CPH1_lbl_facetoface'):
       method = driver.find_element_by_id('CPH1_lbl_facetoface')
       print(method.text)
@@ -123,19 +124,6 @@ for j in range(0, 1):
     else:
       print('授業形態確認なし・公式シラバスを確認ください')
       csvlist.append('授業形態なし・公式シラバスを確認ください')
-    # try:
-    #   method = driver.find_element_by_id('CPH1_lbl_facetoface')
-    #   print(method.text)
-    #   csvlist.append(method.text)
-    # except NoSuchElementException:
-    #   None
-    # try:
-    #   method = driver.find_element_by_id('CPH1_lbl_online')
-    #   print(method.text)
-    #   csvlist.append(method.text)
-    # except NoSuchElementException:
-    #   print('授業形態確認なし・公式シラバスを確認ください')
-    #   csvlist.append('授業形態なし・公式シラバスを確認ください')
 
     # 授業の講義概要の取得
     try:
@@ -145,18 +133,6 @@ for j in range(0, 1):
     except NoSuchElementException:
       print('講義概要なし・公式シラバスを確認ください')
       csvlist.append('講義概要なし・公式シラバスを確認ください')
-
-    
-
-    # if driver.find_element_by_id('CPH1_lbl_facetoface').text:
-    #   method = driver.find_element_by_id('CPH1_lbl_facetoface')
-    #   print(method.text)
-    # elif driver.find_element_by_id('CPH1_lbl_online').text:
-    #   method = driver.find_element_by_id('CPH1_lbl_online')
-    #   print(method.text)
-    # else:
-    #   csvlist.append('授業形態確認なし・公式シラバスを確認ください')
-    
 
     # １行づつCSVに書き込み
     writer.writerow(csvlist)
@@ -168,8 +144,11 @@ for j in range(0, 1):
   
   # 次のページへのボタン
   driver.implicitly_wait(10)
-  nextBtn = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
-  driver.execute_script('arguments[0].click();', nextBtn)
+  if driver.find_elements_by_id('CPH1_rptPagerB_lnkNext'):
+    nextBtn = driver.find_element_by_id('CPH1_rptPagerB_lnkNext')
+    driver.execute_script('arguments[0].click();', nextBtn)
+  else:
+    None
 
 f.close()
 # try:
