@@ -1,0 +1,3 @@
+# coursearch
+scraping syllabus
+大学のシラバス検索システムのスクレイピング用プログラム
